@@ -1,8 +1,6 @@
 // Copyright © Aptos Foundation
 
 use anyhow::{Context, Result};
-#[cfg(target_os = "linux")]
-use aptos_system_utils::profiling::start_cpu_profiling;
 use backtrace::Backtrace;
 use clap::Parser;
 use prometheus::{Encoder, TextEncoder};
@@ -167,41 +165,11 @@ async fn register_probes_and_metrics_handler(port: u16) {
             .body(encode_buffer)
     });
 
-    if cfg!(target_os = "linux") {
-        #[cfg(target_os = "linux")]
-        let profilez = warp::path("profilez").and_then(|| async move {
-            // TODO(grao): Consider make the parameters configurable.
-            Ok::<_, Infallible>(match start_cpu_profiling(10, 99, false).await {
-                Ok(body) => {
-                    let response = Response::builder()
-                        .header("Content-Length", body.len())
-                        .header("Content-Disposition", "inline")
-                        .header("Content-Type", "image/svg+xml")
-                        .body(body);
-
-                    match response {
-                        Ok(res) => warp::reply::with_status(res, warp::http::StatusCode::OK),
-                        Err(e) => warp::reply::with_status(
-                            Response::new(format!("Profiling failed: {e:?}.").as_bytes().to_vec()),
-                            warp::http::StatusCode::INTERNAL_SERVER_ERROR,
-                        ),
-                    }
-                },
-                Err(e) => warp::reply::with_status(
-                    Response::new(format!("Profiling failed: {e:?}.").as_bytes().to_vec()),
-                    warp::http::StatusCode::INTERNAL_SERVER_ERROR,
-                ),
-            })
-        });
-        #[cfg(target_os = "linux")]
-        warp::serve(readiness.or(metrics_endpoint).or(profilez))
-            .run(([0, 0, 0, 0], port))
-            .await;
-    } else {
-        warp::serve(readiness.or(metrics_endpoint))
-            .run(([0, 0, 0, 0], port))
-            .await;
-    }
+    
+    warp::serve(readiness.or(metrics_endpoint))
+        .run(([0, 0, 0, 0], port))
+        .await;
+    
 }
 
 #[cfg(test)]

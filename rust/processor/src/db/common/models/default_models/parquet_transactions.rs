@@ -310,23 +310,7 @@ impl Transaction {
                 None,
                 vec![],
                 vec![],
-            ),
-            TxnData::BlockEpilogue(_) => (
-                Self::from_transaction_info_with_data(
-                    transaction_info,
-                    None,
-                    None,
-                    txn_version,
-                    transaction_type,
-                    0,
-                    block_height,
-                    epoch,
-                    block_timestamp,
-                ),
-                None,
-                vec![],
-                vec![],
-            ),
+            )
         }
     }
 

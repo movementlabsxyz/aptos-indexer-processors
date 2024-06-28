@@ -19,8 +19,8 @@ extern crate parquet_derive;
 pub use config::IndexerGrpcProcessorConfig;
 
 pub mod bq_analytics;
-mod config;
-mod db;
+pub mod config;
+pub mod db;
 pub mod gap_detectors;
 pub mod grpc_stream;
 pub mod processors;
