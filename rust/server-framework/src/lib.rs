@@ -1,8 +1,6 @@
 // Copyright © Aptos Foundation
 
 use anyhow::{Context, Result};
-#[cfg(target_os = "linux")]
-use aptos_system_utils::profiling::start_cpu_profiling;
 use backtrace::Backtrace;
 use clap::Parser;
 use prometheus::{Encoder, TextEncoder};
