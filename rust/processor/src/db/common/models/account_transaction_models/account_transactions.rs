@@ -58,6 +58,8 @@ impl AccountTransaction {
             panic!("Transaction info doesn't exist for version {}", txn_version)
         });
         let wscs = &transaction_info.changes;
+        // Can be removed with rustc version 1.80+ and replace with &Vec::new()
+        let default = Vec::new();
         let (events, signatures) = match txn_data {
             TxnData::User(inner) => (
                 &inner.events,
@@ -71,7 +73,8 @@ impl AccountTransaction {
             ),
             TxnData::Genesis(inner) => (&inner.events, vec![]),
             TxnData::BlockMetadata(inner) => (&inner.events, vec![]),
-            TxnData::Validator(_inner) => (&Vec::new(), vec![]),
+            // No events in Movement protobuf Validator Tx.
+            TxnData::Validator(_inner) => (&default, vec![]),
             _ => {
                 return AHashMap::new();
             },

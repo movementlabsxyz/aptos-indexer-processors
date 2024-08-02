@@ -131,7 +131,7 @@ impl ProcessorTrait for EventsProcessor {
                 TxnData::Genesis(tx_inner) => &tx_inner.events,
                 TxnData::User(tx_inner) => &tx_inner.events,
                 // No events in Movement protobuf Validator Tx.
-                TxnData::Validator(_tx_inner) => &Vec::new(),
+                TxnData::Validator(_tx_inner) => &default,
                 _ => &default,
             };
 

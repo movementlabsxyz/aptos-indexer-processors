@@ -47,11 +47,14 @@ impl DelegatedStakingActivity {
         };
 
         let txn_version = transaction.version as i64;
+        // Can be removed with rustc version 1.80+ and replace with &Vec::new()
+        let default = Vec::new();
+
         let events = match txn_data {
             TxnData::User(txn) => &txn.events,
             TxnData::BlockMetadata(txn) => &txn.events,
             // No events in Movement protobuf Validator Tx.
-            TxnData::Validator(_txn) => &Vec::new(),
+            TxnData::Validator(_txn) => &default,
             _ => return Ok(delegator_activities),
         };
         for (index, event) in events.iter().enumerate() {
