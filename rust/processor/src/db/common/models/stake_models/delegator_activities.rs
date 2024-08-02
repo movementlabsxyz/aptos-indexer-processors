@@ -50,7 +50,8 @@ impl DelegatedStakingActivity {
         let events = match txn_data {
             TxnData::User(txn) => &txn.events,
             TxnData::BlockMetadata(txn) => &txn.events,
-            TxnData::Validator(txn) => &txn.events,
+            // No events in Movement protobuf Validator Tx.
+            TxnData::Validator(_txn) => &Vec::new(),
             _ => return Ok(delegator_activities),
         };
         for (index, event) in events.iter().enumerate() {

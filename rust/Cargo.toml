@@ -9,7 +9,7 @@ edition = "2021"
 homepage = "https://aptoslabs.com"
 license = "Apache-2.0"
 publish = false
-repository = "https://github.com/aptos-labs/aptos-indexer-processors"
+repository = "https://github.com/movementlabsxyz/aptos-indexer-processors"
 rust-version = "1.75"
 
 [workspace.dependencies]
@@ -19,8 +19,9 @@ aptos-moving-average = { path = "moving-average" }
 
 ahash = { version = "0.8.7", features = ["serde"] }
 anyhow = "1.0.62"
-aptos-protos = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "5c48aee129b5a141be2792ffa3d9bd0a1a61c9cb" }
-aptos-system-utils = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "4541add3fd29826ec57f22658ca286d2d6134b93" }
+# Aptos repos must have the same rev has the Suzuka node it connect to.
+aptos-protos = { git = "https://github.com/movementlabsxyz/aptos-core", rev = "074c4bac6cab49c0e6deaff99ce8d2814ab6e812" }
+aptos-system-utils = { git = "https://github.com/movementlabsxyz/aptos-core", rev = "074c4bac6cab49c0e6deaff99ce8d2814ab6e812" }
 async-trait = "0.1.53"
 backtrace = "0.3.58"
 base64 = "0.13.0"
