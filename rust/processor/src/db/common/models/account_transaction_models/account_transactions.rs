@@ -58,6 +58,8 @@ impl AccountTransaction {
             panic!("Transaction info doesn't exist for version {}", txn_version)
         });
         let wscs = &transaction_info.changes;
+        // Can be removed with rustc version 1.80+ and replace with &Vec::new()
+        let default = Vec::new();
         let (events, signatures) = match txn_data {
             TxnData::User(inner) => (
                 &inner.events,
@@ -71,17 +73,21 @@ impl AccountTransaction {
             ),
             TxnData::Genesis(inner) => (&inner.events, vec![]),
             TxnData::BlockMetadata(inner) => (&inner.events, vec![]),
-            TxnData::Validator(inner) => (&inner.events, vec![]),
+            // No events in Movement protobuf Validator Tx.
+            TxnData::Validator(_inner) => (&default, vec![]),
             _ => {
                 return AHashMap::new();
             },
         };
         let mut account_transactions = AHashMap::new();
         for sig in &signatures {
-            account_transactions.insert((sig.signer.clone(), txn_version), Self {
-                transaction_version: txn_version,
-                account_address: sig.signer.clone(),
-            });
+            account_transactions.insert(
+                (sig.signer.clone(), txn_version),
+                Self {
+                    transaction_version: txn_version,
+                    account_address: sig.signer.clone(),
+                },
+            );
         }
         for event in events {
             account_transactions.extend(Self::from_event(event, txn_version));
@@ -107,10 +113,13 @@ impl AccountTransaction {
     fn from_event(event: &Event, txn_version: i64) -> AHashMap<AccountTransactionPK, Self> {
         let account_address =
             standardize_address(event.key.as_ref().unwrap().account_address.as_str());
-        AHashMap::from([((account_address.clone(), txn_version), Self {
-            transaction_version: txn_version,
-            account_address,
-        })])
+        AHashMap::from([(
+            (account_address.clone(), txn_version),
+            Self {
+                transaction_version: txn_version,
+                account_address,
+            },
+        )])
     }
 
     /// Base case, record resource account. If the resource is an object, then we record the owner as well
@@ -121,16 +130,22 @@ impl AccountTransaction {
     ) -> anyhow::Result<AHashMap<AccountTransactionPK, Self>> {
         let mut result = AHashMap::new();
         let account_address = standardize_address(write_resource.address.as_str());
-        result.insert((account_address.clone(), txn_version), Self {
-            transaction_version: txn_version,
-            account_address,
-        });
+        result.insert(
+            (account_address.clone(), txn_version),
+            Self {
+                transaction_version: txn_version,
+                account_address,
+            },
+        );
         if let Some(inner) = &ObjectWithMetadata::from_write_resource(write_resource, txn_version)?
         {
-            result.insert((inner.object_core.get_owner_address(), txn_version), Self {
-                transaction_version: txn_version,
-                account_address: inner.object_core.get_owner_address(),
-            });
+            result.insert(
+                (inner.object_core.get_owner_address(), txn_version),
+                Self {
+                    transaction_version: txn_version,
+                    account_address: inner.object_core.get_owner_address(),
+                },
+            );
         }
         Ok(result)
     }
@@ -145,10 +160,13 @@ impl AccountTransaction {
     ) -> anyhow::Result<AHashMap<AccountTransactionPK, Self>> {
         let mut result = AHashMap::new();
         let account_address = standardize_address(delete_resource.address.as_str());
-        result.insert((account_address.clone(), txn_version), Self {
-            transaction_version: txn_version,
-            account_address,
-        });
+        result.insert(
+            (account_address.clone(), txn_version),
+            Self {
+                transaction_version: txn_version,
+                account_address,
+            },
+        );
         Ok(result)
     }
 }

@@ -148,7 +148,7 @@ dependencies = [
 [[package]]
 name = "aptos-profiler"
 version = "0.1.0"
-source = "git+https://github.com/aptos-labs/aptos-core.git?rev=4541add3fd29826ec57f22658ca286d2d6134b93#4541add3fd29826ec57f22658ca286d2d6134b93"
+source = "git+https://github.com/movementlabsxyz/aptos-core?rev=074c4bac6cab49c0e6deaff99ce8d2814ab6e812#074c4bac6cab49c0e6deaff99ce8d2814ab6e812"
 dependencies = [
  "anyhow",
  "backtrace",
@@ -160,8 +160,8 @@ dependencies = [
 
 [[package]]
 name = "aptos-protos"
-version = "1.3.1"
-source = "git+https://github.com/aptos-labs/aptos-core.git?rev=5c48aee129b5a141be2792ffa3d9bd0a1a61c9cb#5c48aee129b5a141be2792ffa3d9bd0a1a61c9cb"
+version = "1.3.0"
+source = "git+https://github.com/movementlabsxyz/aptos-core?rev=074c4bac6cab49c0e6deaff99ce8d2814ab6e812#074c4bac6cab49c0e6deaff99ce8d2814ab6e812"
 dependencies = [
  "futures-core",
  "pbjson",
@@ -173,7 +173,7 @@ dependencies = [
 [[package]]
 name = "aptos-system-utils"
 version = "0.1.0"
-source = "git+https://github.com/aptos-labs/aptos-core.git?rev=4541add3fd29826ec57f22658ca286d2d6134b93#4541add3fd29826ec57f22658ca286d2d6134b93"
+source = "git+https://github.com/movementlabsxyz/aptos-core?rev=074c4bac6cab49c0e6deaff99ce8d2814ab6e812#074c4bac6cab49c0e6deaff99ce8d2814ab6e812"
 dependencies = [
  "anyhow",
  "aptos-profiler",
