@@ -20,8 +20,8 @@ aptos-moving-average = { path = "moving-average" }
 ahash = { version = "0.8.7", features = ["serde"] }
 anyhow = "1.0.62"
 # Aptos repos must have the same rev has the Suzuka node it connect to.
-aptos-protos = { git = "https://github.com/movementlabsxyz/aptos-core", rev = "074c4bac6cab49c0e6deaff99ce8d2814ab6e812" }
-aptos-system-utils = { git = "https://github.com/movementlabsxyz/aptos-core", rev = "074c4bac6cab49c0e6deaff99ce8d2814ab6e812" }
+aptos-protos = { git = "https://github.com/movementlabsxyz/aptos-core", rev = "51d875c93565e11f4e3f8321d200b406ed55a28" }
+aptos-system-utils = { git = "https://github.com/movementlabsxyz/aptos-core", rev = "51d875c93565e11f4e3f8321d200b406ed55a28" }
 async-trait = "0.1.53"
 backtrace = "0.3.58"
 base64 = "0.13.0"
