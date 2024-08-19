@@ -27,7 +27,6 @@ use diesel::{
 };
 use std::fmt::Debug;
 use tokio::join;
-use tracing::error;
 
 pub struct DefaultProcessor {
     connection_pool: ArcDbPool,
@@ -168,7 +167,6 @@ fn insert_transactions_query(
     Option<&'static str>,
 ) {
     use schema::transactions::dsl::*;
-
     (
         diesel::insert_into(schema::transactions::table)
             .values(items_to_insert)
@@ -367,7 +365,7 @@ impl ProcessorTrait for DefaultProcessor {
                 },
             )),
             Err(e) => {
-                error!(
+                tracing::warn!(
                     start_version = start_version,
                     end_version = end_version,
                     processor_name = self.name(),

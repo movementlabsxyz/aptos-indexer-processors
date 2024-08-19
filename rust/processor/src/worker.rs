@@ -829,12 +829,52 @@ pub async fn do_processor(
 
     let processed_result = processor
         .process_transactions(
-            transactions_pb.transactions,
+            transactions_pb.transactions.clone(),
             start_version,
             end_version,
             Some(db_chain_id),
         )
         .await;
+    let processed_result = if let Err(err) = processed_result {
+        // If the Tx processing abort because of KKey violation, skip the Tx.
+        // As several Tx has been processed replay all the Tx one by one to
+        // allow not present Tx to be saved.
+        if let Some(diesel::result::Error::DatabaseError(
+            diesel::result::DatabaseErrorKind::UniqueViolation,
+            msg,
+        )) = err.downcast_ref::<diesel::result::Error>()
+        {
+            tracing::warn!("Unique Constraint violation replay the Tx: msg: {msg:?}");
+            //replay all Tx one by one
+            let mut last_transaction_timestamp = None;
+            for tx in transactions_pb.transactions {
+                let timestamp = tx.timestamp.clone();
+                if let Err(err) = processor
+                    .process_transactions(vec![tx], start_version, end_version, Some(db_chain_id))
+                    .await
+                {
+                    tracing::warn!("Unique Constraint violation skip Tx, err: {err:?}",);
+                } else {
+                    if timestamp.is_some() {
+                        last_transaction_timestamp = timestamp;
+                    }
+                }
+            }
+            Ok(ProcessingResult::DefaultProcessingResult(
+                DefaultProcessingResult {
+                    start_version,
+                    end_version,
+                    processing_duration_in_secs: 0.0,
+                    db_insertion_duration_in_secs: 0.0,
+                    last_transaction_timestamp,
+                },
+            ))
+        } else {
+            Err(err)
+        }
+    } else {
+        processed_result
+    };
 
     if let Some(ref t) = txn_time {
         PROCESSOR_DATA_PROCESSED_LATENCY_IN_SECS
