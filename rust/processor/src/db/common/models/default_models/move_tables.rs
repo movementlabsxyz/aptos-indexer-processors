@@ -66,11 +66,19 @@ impl TableItem {
                 key: write_table_item.key.to_string(),
                 table_handle: standardize_address(&write_table_item.handle.to_string()),
                 decoded_key: serde_json::from_str(
-                    write_table_item.data.as_ref().unwrap().key.as_str(),
+                    write_table_item
+                        .data
+                        .as_ref()
+                        .map(|data| data.key.as_str())
+                        .unwrap_or("{}"),
                 )
                 .unwrap(),
                 decoded_value: serde_json::from_str(
-                    write_table_item.data.as_ref().unwrap().value.as_str(),
+                    write_table_item
+                        .data
+                        .as_ref()
+                        .map(|data| data.value.as_str())
+                        .unwrap_or("{}"),
                 )
                 .unwrap(),
                 is_deleted: false,
@@ -80,11 +88,19 @@ impl TableItem {
                 key_hash: hash_str(&write_table_item.key.to_string()),
                 key: write_table_item.key.to_string(),
                 decoded_key: serde_json::from_str(
-                    write_table_item.data.as_ref().unwrap().key.as_str(),
+                    write_table_item
+                        .data
+                        .as_ref()
+                        .map(|data| data.key.as_str())
+                        .unwrap_or("{}"),
                 )
                 .unwrap(),
                 decoded_value: serde_json::from_str(
-                    write_table_item.data.as_ref().unwrap().value.as_str(),
+                    write_table_item
+                        .data
+                        .as_ref()
+                        .map(|data| data.value.as_str())
+                        .unwrap_or("{}"),
                 )
                 .unwrap(),
                 last_transaction_version: transaction_version,
@@ -107,7 +123,11 @@ impl TableItem {
                 key: delete_table_item.key.to_string(),
                 table_handle: standardize_address(&delete_table_item.handle.to_string()),
                 decoded_key: serde_json::from_str(
-                    delete_table_item.data.as_ref().unwrap().key.as_str(),
+                    delete_table_item
+                        .data
+                        .as_ref()
+                        .map(|data| data.key.as_str())
+                        .unwrap_or("{}"),
                 )
                 .unwrap(),
 
@@ -119,7 +139,11 @@ impl TableItem {
                 key_hash: hash_str(&delete_table_item.key.to_string()),
                 key: delete_table_item.key.to_string(),
                 decoded_key: serde_json::from_str(
-                    delete_table_item.data.as_ref().unwrap().key.as_str(),
+                    delete_table_item
+                        .data
+                        .as_ref()
+                        .map(|data| data.key.as_str())
+                        .unwrap_or("{}"),
                 )
                 .unwrap(),
                 decoded_value: None,
@@ -134,8 +158,16 @@ impl TableMetadata {
     pub fn from_write_table_item(table_item: &WriteTableItem) -> Self {
         Self {
             handle: table_item.handle.to_string(),
-            key_type: table_item.data.as_ref().unwrap().key_type.clone(),
-            value_type: table_item.data.as_ref().unwrap().value_type.clone(),
+            key_type: table_item
+                .data
+                .as_ref()
+                .map(|data| data.key_type.clone())
+                .unwrap_or(String::new()),
+            value_type: table_item
+                .data
+                .as_ref()
+                .map(|data| data.value_type.clone())
+                .unwrap_or(String::new()),
         }
     }
 }

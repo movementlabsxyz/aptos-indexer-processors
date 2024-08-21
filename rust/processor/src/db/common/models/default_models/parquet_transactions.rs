@@ -314,7 +314,7 @@ impl Transaction {
                 vec![],
                 vec![],
             ),
-            TxnData::Validator(inner) => {
+            TxnData::Validator(_inner) => {
                 let (wsc, wsc_detail) = WriteSetChangeModel::from_write_set_changes(
                     &transaction_info.changes,
                     txn_version,
@@ -328,7 +328,8 @@ impl Transaction {
                         None,
                         txn_version,
                         transaction_type,
-                        inner.events.len() as i64,
+                        // No events in Movement protobuf Validator Tx.
+                        0,
                         block_height,
                         epoch,
                         block_timestamp,
