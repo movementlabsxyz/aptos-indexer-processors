@@ -316,6 +316,7 @@ pub async fn create_fetcher_loop(
     transaction_filter: crate::transaction_filter::TransactionFilter,
     // The number of transactions per protobuf batch
     pb_channel_txn_chunk_size: usize,
+    sleep_time_between_request: u64,
 ) {
     info!(
         processor_name = processor_name,
@@ -359,6 +360,12 @@ pub async fn create_fetcher_loop(
     let mut send_ma = MovingAverage::new(3000);
 
     loop {
+        //Add a sleep to slow down indexer query
+        tokio::time::sleep(tokio::time::Duration::from_millis(
+            sleep_time_between_request,
+        ))
+        .await;
+
         let is_success = match tokio::time::timeout(
             indexer_grpc_response_item_timeout_secs,
             resp_stream.next(),

@@ -14,6 +14,7 @@ use url::Url;
 
 pub const QUERY_DEFAULT_RETRIES: u32 = 5;
 pub const QUERY_DEFAULT_RETRY_DELAY_MS: u64 = 500;
+pub const DEFAULT_SLEEP_TIME_BETWENN_REQUEST_MS: u64 = 10;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -55,9 +56,14 @@ pub struct IndexerGrpcProcessorConfig {
     // String vector for deprecated tables to skip db writes
     #[serde(default)]
     pub deprecated_tables: HashSet<String>,
+    #[serde(default = "IndexerGrpcProcessorConfig::default_sleep_time_between_request")]
+    pub default_sleep_time_between_request: u64,
 }
 
 impl IndexerGrpcProcessorConfig {
+    pub const fn default_sleep_time_between_request() -> u64 {
+        DEFAULT_SLEEP_TIME_BETWENN_REQUEST_MS
+    }
     pub const fn default_gap_detection_batch_size() -> u64 {
         DEFAULT_GAP_DETECTION_BATCH_SIZE
     }
@@ -103,6 +109,7 @@ impl RunnableConfig for IndexerGrpcProcessorConfig {
             self.transaction_filter.clone(),
             self.grpc_response_item_timeout_in_secs,
             self.deprecated_tables.clone(),
+            self.default_sleep_time_between_request,
         )
         .await
         .context("Failed to build worker")?;
