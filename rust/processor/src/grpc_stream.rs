@@ -361,10 +361,12 @@ pub async fn create_fetcher_loop(
 
     loop {
         //Add a sleep to slow down indexer query
-        tokio::time::sleep(tokio::time::Duration::from_millis(
-            sleep_time_between_request,
-        ))
-        .await;
+        if sleep_time_between_request != 0 {
+            tokio::time::sleep(tokio::time::Duration::from_millis(
+                sleep_time_between_request,
+            ))
+            .await;
+        }
 
         let is_success = match tokio::time::timeout(
             indexer_grpc_response_item_timeout_secs,
