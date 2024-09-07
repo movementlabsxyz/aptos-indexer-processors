@@ -29,19 +29,29 @@ impl CurrentStakingPoolVoter {
         let mut staking_pool_voters = AHashMap::new();
 
         let txn_version = transaction.version as i64;
-        for wsc in &transaction.info.as_ref().unwrap().changes {
+        for wsc in transaction
+            .info
+            .as_ref()
+            .unwrap()
+            .changes
+            .iter()
+            .filter(|wsc| wsc.change.is_some())
+        {
             if let Change::WriteResource(write_resource) = wsc.change.as_ref().unwrap() {
                 if let Some(StakeResource::StakePool(inner)) =
                     StakeResource::from_write_resource(write_resource, txn_version)?
                 {
                     let staking_pool_address =
                         standardize_address(&write_resource.address.to_string());
-                    staking_pool_voters.insert(staking_pool_address.clone(), Self {
-                        staking_pool_address,
-                        voter_address: inner.get_delegated_voter(),
-                        last_transaction_version: txn_version,
-                        operator_address: inner.get_operator_address(),
-                    });
+                    staking_pool_voters.insert(
+                        staking_pool_address.clone(),
+                        Self {
+                            staking_pool_address,
+                            voter_address: inner.get_delegated_voter(),
+                            last_transaction_version: txn_version,
+                            operator_address: inner.get_operator_address(),
+                        },
+                    );
                 }
             }
         }

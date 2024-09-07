@@ -441,7 +441,11 @@ impl ProcessorTrait for StakeProcessor {
             let txn_timestamp = parse_timestamp(txn.timestamp.as_ref().unwrap(), txn_version);
             let transaction_info = txn.info.as_ref().expect("Transaction info doesn't exist!");
             // adding some metadata for subsequent parsing
-            for wsc in &transaction_info.changes {
+            for wsc in transaction_info
+                .changes
+                .iter()
+                .filter(|wsc| wsc.change.is_some())
+            {
                 if let Change::WriteResource(write_resource) = wsc.change.as_ref().unwrap() {
                     if let Some(DelegationVoteGovernanceRecordsResource::GovernanceRecords(inner)) =
                         DelegationVoteGovernanceRecordsResource::from_write_resource(
@@ -484,7 +488,11 @@ impl ProcessorTrait for StakeProcessor {
             all_current_delegator_balances.extend(current_delegator_balances);
 
             // this write table item indexing is to get delegator address, table handle, and voter & pending voter
-            for wsc in &transaction_info.changes {
+            for wsc in transaction_info
+                .changes
+                .iter()
+                .filter(|wsc| wsc.change.is_some())
+            {
                 if let Change::WriteTableItem(write_table_item) = wsc.change.as_ref().unwrap() {
                     let voter_map = CurrentDelegatedVoter::from_write_table_item(
                         write_table_item,
@@ -503,7 +511,11 @@ impl ProcessorTrait for StakeProcessor {
             }
 
             // we need one last loop to prefill delegators that got in before the delegated voting contract was deployed
-            for wsc in &transaction_info.changes {
+            for wsc in transaction_info
+                .changes
+                .iter()
+                .filter(|wsc| wsc.change.is_some())
+            {
                 if let Change::WriteTableItem(write_table_item) = wsc.change.as_ref().unwrap() {
                     if let Some(voter) =
                         CurrentDelegatedVoter::get_delegators_pre_contract_deployment(

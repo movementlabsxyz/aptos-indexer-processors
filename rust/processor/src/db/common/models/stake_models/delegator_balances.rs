@@ -409,7 +409,7 @@ impl CurrentDelegatorBalance {
 
         let changes = &transaction.info.as_ref().unwrap().changes;
         // Do a first pass to get the mapping of active_share table handles to staking pool resource        let txn_version = transaction.version as i64;
-        for wsc in changes {
+        for wsc in changes.iter().filter(|wsc| wsc.change.is_some()) {
             if let Change::WriteResource(write_resource) = wsc.change.as_ref().unwrap() {
                 if let Some(map) =
                     Self::get_inactive_pool_to_staking_pool_mapping(write_resource, txn_version)
@@ -428,7 +428,11 @@ impl CurrentDelegatorBalance {
             }
         }
         // Now make a pass through table items to get the actual delegator balances
-        for (index, wsc) in changes.iter().enumerate() {
+        for (index, wsc) in changes
+            .iter()
+            .filter(|wsc| wsc.change.is_some())
+            .enumerate()
+        {
             let maybe_delegator_balance = match wsc.change.as_ref().unwrap() {
                 Change::DeleteTableItem(table_item) => {
                     if let Some((balance, current_balance)) =

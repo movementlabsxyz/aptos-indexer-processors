@@ -222,8 +222,14 @@ pub fn get_clean_payload(payload: &TransactionPayload, version: i64) -> Option<V
 /// Part of the json comes escaped from the protobuf so we need to unescape in a safe way
 /// Note that DirectWriteSet is just events + writeset which is already represented separately
 pub fn get_clean_writeset(writeset: &WriteSet, version: i64) -> Option<Value> {
+    if writeset.write_set.is_none() {
+        return None;
+    }
     match writeset.write_set.as_ref().unwrap() {
         WriteSetType::ScriptWriteSet(inner) => {
+            if inner.script.is_none() {
+                return None;
+            }
             let payload = inner.script.as_ref().unwrap();
             Some(
                 serde_json::to_value(get_clean_script_payload(payload, version)).unwrap_or_else(

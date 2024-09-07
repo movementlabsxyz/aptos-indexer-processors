@@ -72,6 +72,9 @@ impl TokenData {
         txn_version: i64,
         txn_timestamp: chrono::NaiveDateTime,
     ) -> anyhow::Result<Option<(Self, CurrentTokenData)>> {
+        if table_item.data.is_none() {
+            return Ok(None);
+        }
         let table_item_data = table_item.data.as_ref().unwrap();
 
         let maybe_token_data = match TokenWriteSet::from_table_item_type(

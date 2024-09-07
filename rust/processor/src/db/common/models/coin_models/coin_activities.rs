@@ -149,7 +149,11 @@ impl CoinActivity {
         }
 
         // Need coin info from move resources
-        for wsc in &transaction_info.changes {
+        for wsc in transaction_info
+            .changes
+            .iter()
+            .filter(|wsc| wsc.change.is_some())
+        {
             let (maybe_coin_info, maybe_coin_balance_data) =
                 if let WriteSetChangeEnum::WriteResource(write_resource) =
                     &wsc.change.as_ref().unwrap()

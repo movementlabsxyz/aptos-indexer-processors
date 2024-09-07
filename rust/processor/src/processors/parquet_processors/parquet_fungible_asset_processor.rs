@@ -179,7 +179,11 @@ async fn parse_v2_coin(
 
         // First loop to get all objects
         // Need to do a first pass to get all the objects
-        for wsc in transaction_info.changes.iter() {
+        for wsc in transaction_info
+            .changes
+            .iter()
+            .filter(|wsc| wsc.change.is_some())
+        {
             if let Change::WriteResource(wr) = wsc.change.as_ref().unwrap() {
                 if let Some(object) =
                     ObjectWithMetadata::from_write_resource(wr, txn_version).unwrap()
@@ -195,7 +199,12 @@ async fn parse_v2_coin(
             }
         }
 
-        for (index, wsc) in transaction_info.changes.iter().enumerate() {
+        for (index, wsc) in transaction_info
+            .changes
+            .iter()
+            .filter(|wsc| wsc.change.is_some())
+            .enumerate()
+        {
             if let Change::WriteResource(write_resource) = wsc.change.as_ref().unwrap() {
                 if let Some((balance, _, _)) = FungibleAssetBalance::get_v1_from_write_resource(
                     write_resource,
@@ -230,7 +239,12 @@ async fn parse_v2_coin(
         }
 
         // Loop to handle all the other changes
-        for (index, wsc) in transaction_info.changes.iter().enumerate() {
+        for (index, wsc) in transaction_info
+            .changes
+            .iter()
+            .filter(|wsc| wsc.change.is_some())
+            .enumerate()
+        {
             match wsc.change.as_ref().unwrap() {
                 Change::WriteResource(write_resource) => {
                     if let Some((balance, _)) = FungibleAssetBalance::get_v2_from_write_resource(
