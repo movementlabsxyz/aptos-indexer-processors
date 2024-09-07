@@ -61,12 +61,8 @@ impl WriteSetChange {
         block_timestamp: chrono::NaiveDateTime,
     ) -> anyhow::Result<Option<(Self, WriteSetChangeDetail)>> {
         let change_type = Self::get_write_set_change_type(write_set_change);
-        let change = write_set_change
-            .change
-            .as_ref()
-            .expect("WriteSetChange must have a change");
-        match change {
-            WriteSetChangeEnum::WriteModule(inner) => Ok(Some((
+        match write_set_change.change.as_ref() {
+            Some(WriteSetChangeEnum::WriteModule(inner)) => Ok(Some((
                 Self {
                     txn_version,
                     state_key_hash: standardize_address(
@@ -86,7 +82,7 @@ impl WriteSetChange {
                     block_timestamp,
                 )),
             ))),
-            WriteSetChangeEnum::DeleteModule(inner) => Ok(Some((
+            Some(WriteSetChangeEnum::DeleteModule(inner)) => Ok(Some((
                 Self {
                     txn_version,
                     state_key_hash: standardize_address(
@@ -106,7 +102,7 @@ impl WriteSetChange {
                     block_timestamp,
                 )),
             ))),
-            WriteSetChangeEnum::WriteResource(inner) => {
+            Some(WriteSetChangeEnum::WriteResource(inner)) => {
                 let resource_option = MoveResource::from_write_resource(
                     inner,
                     write_set_change_index,
@@ -138,7 +134,7 @@ impl WriteSetChange {
                         ))
                     })
             },
-            WriteSetChangeEnum::DeleteResource(inner) => {
+            Some(WriteSetChangeEnum::DeleteResource(inner)) => {
                 let resource_option = MoveResource::from_delete_resource(
                     inner,
                     write_set_change_index,
@@ -170,7 +166,7 @@ impl WriteSetChange {
                         ))
                     })
             },
-            WriteSetChangeEnum::WriteTableItem(inner) => {
+            Some(WriteSetChangeEnum::WriteTableItem(inner)) => {
                 let (ti, cti) = TableItem::from_write_table_item(
                     inner,
                     write_set_change_index,
@@ -197,7 +193,7 @@ impl WriteSetChange {
                     ),
                 )))
             },
-            WriteSetChangeEnum::DeleteTableItem(inner) => {
+            Some(WriteSetChangeEnum::DeleteTableItem(inner)) => {
                 let (ti, cti) = TableItem::from_delete_table_item(
                     inner,
                     write_set_change_index,
@@ -220,6 +216,7 @@ impl WriteSetChange {
                     WriteSetChangeDetail::Table(ti, cti, None),
                 )))
             },
+            None => Ok(None),
         }
     }
 
