@@ -364,7 +364,10 @@ impl TableMetadataForToken {
                     .info
                     .as_ref()
                     .expect("Transaction info doesn't exist!");
-                for wsc in &transaction_info.changes {
+                for wsc in transaction_info
+                    .changes
+                    .iterfilter(|wsc| wsc.change.is_some())
+                {
                     if let WriteSetChangeEnum::WriteResource(write_resource) =
                         wsc.change.as_ref().unwrap()
                     {
