@@ -845,13 +845,12 @@ pub async fn do_processor(
         // If the Tx processing abort because of KKey violation, skip the Tx.
         // As several Tx has been processed replay all the Tx one by one to
         // allow not present Tx to be saved.
-        // if let Some(diesel::result::Error::DatabaseError(
-        //     diesel::result::DatabaseErrorKind::UniqueViolation,
-        //     msg,
-        // )) = err.downcast_ref::<diesel::result::Error>()
+        if let Some(diesel::result::Error::DatabaseError(
+            diesel::result::DatabaseErrorKind::UniqueViolation,
+            msg,
+        )) = err.downcast_ref::<diesel::result::Error>()
         {
-            //           tracing::warn!("Unique Constraint violation replay the Tx: msg: {msg:?}");
-            tracing::warn!("Error during Tx processing, replay all Tx one by one: err: {err:?}");
+            tracing::warn!("Unique Constraint violation replay the Tx: msg: {msg:?}");
             //replay all Tx one by one
             let mut last_transaction_timestamp = None;
             for tx in transactions_pb.transactions {
@@ -876,10 +875,9 @@ pub async fn do_processor(
                     last_transaction_timestamp,
                 },
             ))
+        } else {
+            Err(err)
         }
-        // } else {
-        //     Err(err)
-        // }
     } else {
         processed_result
     };
