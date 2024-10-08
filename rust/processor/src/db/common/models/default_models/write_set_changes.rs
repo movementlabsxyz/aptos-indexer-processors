@@ -41,15 +41,11 @@ impl WriteSetChange {
         index: i64,
         transaction_version: i64,
         transaction_block_height: i64,
-    ) -> (Self, WriteSetChangeDetail) {
+    ) -> Option<(Self, WriteSetChangeDetail)> {
         let type_ = Self::get_write_set_change_type(write_set_change);
-        let change = write_set_change
-            .change
-            .as_ref()
-            .expect("WriteSetChange must have a change");
 
-        match change {
-            WriteSetChangeEnum::WriteModule(inner) => (
+        match write_set_change.change.as_ref() {
+            Some(WriteSetChangeEnum::WriteModule(inner)) => Some((
                 Self {
                     transaction_version,
                     hash: standardize_address_from_bytes(inner.state_key_hash.as_slice()),
@@ -64,8 +60,8 @@ impl WriteSetChange {
                     transaction_version,
                     transaction_block_height,
                 )),
-            ),
-            WriteSetChangeEnum::DeleteModule(inner) => (
+            )),
+            Some(WriteSetChangeEnum::DeleteModule(inner)) => Some((
                 Self {
                     transaction_version,
                     hash: standardize_address_from_bytes(inner.state_key_hash.as_slice()),
@@ -80,8 +76,8 @@ impl WriteSetChange {
                     transaction_version,
                     transaction_block_height,
                 )),
-            ),
-            WriteSetChangeEnum::WriteResource(inner) => (
+            )),
+            Some(WriteSetChangeEnum::WriteResource(inner)) => Some((
                 Self {
                     transaction_version,
                     hash: standardize_address_from_bytes(inner.state_key_hash.as_slice()),
@@ -96,8 +92,8 @@ impl WriteSetChange {
                     transaction_version,
                     transaction_block_height,
                 )),
-            ),
-            WriteSetChangeEnum::DeleteResource(inner) => (
+            )),
+            Some(WriteSetChangeEnum::DeleteResource(inner)) => Some((
                 Self {
                     transaction_version,
                     hash: standardize_address_from_bytes(inner.state_key_hash.as_slice()),
@@ -112,15 +108,15 @@ impl WriteSetChange {
                     transaction_version,
                     transaction_block_height,
                 )),
-            ),
-            WriteSetChangeEnum::WriteTableItem(inner) => {
+            )),
+            Some(WriteSetChangeEnum::WriteTableItem(inner)) => {
                 let (ti, cti) = TableItem::from_write_table_item(
                     inner,
                     index,
                     transaction_version,
                     transaction_block_height,
                 );
-                (
+                Some((
                     Self {
                         transaction_version,
                         hash: standardize_address_from_bytes(inner.state_key_hash.as_slice()),
@@ -134,16 +130,16 @@ impl WriteSetChange {
                         cti,
                         Some(TableMetadata::from_write_table_item(inner)),
                     ),
-                )
+                ))
             },
-            WriteSetChangeEnum::DeleteTableItem(inner) => {
+            Some(WriteSetChangeEnum::DeleteTableItem(inner)) => {
                 let (ti, cti) = TableItem::from_delete_table_item(
                     inner,
                     index,
                     transaction_version,
                     transaction_block_height,
                 );
-                (
+                Some((
                     Self {
                         transaction_version,
                         hash: standardize_address_from_bytes(inner.state_key_hash.as_slice()),
@@ -153,8 +149,9 @@ impl WriteSetChange {
                         index,
                     },
                     WriteSetChangeDetail::Table(ti, cti, None),
-                )
+                ))
             },
+            None => None,
         }
     }
 
@@ -166,7 +163,7 @@ impl WriteSetChange {
         write_set_changes
             .iter()
             .enumerate()
-            .map(|(index, write_set_change)| {
+            .filter_map(|(index, write_set_change)| {
                 Self::from_write_set_change(
                     write_set_change,
                     index as i64,

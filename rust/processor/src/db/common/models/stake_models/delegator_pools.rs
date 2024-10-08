@@ -122,7 +122,7 @@ impl DelegatorPool {
                 .as_ref()
                 .expect("Transaction info doesn't exist!")
                 .changes;
-            for wsc in changes {
+            for wsc in changes.into_iter().filter(|wsc| wsc.change.is_some()) {
                 if let Change::WriteResource(write_resource) = wsc.change.as_ref().unwrap() {
                     let maybe_write_resource =
                         Self::from_write_resource(write_resource, txn_version)?;
@@ -174,6 +174,9 @@ impl DelegatorPool {
         write_table_item: &WriteTableItem,
         txn_version: i64,
     ) -> anyhow::Result<Option<PoolBalanceMetadata>> {
+        if write_table_item.data.is_some() {
+            return Ok(None);
+        }
         let table_item_data = write_table_item.data.as_ref().unwrap();
 
         if let Some(StakeTableItem::Pool(inner)) = &StakeTableItem::from_table_item_type(

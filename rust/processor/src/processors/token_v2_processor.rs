@@ -785,7 +785,11 @@ async fn parse_v2_token(
             let mut tokens_minted: TokenV2Minted = AHashSet::new();
 
             // Need to do a first pass to get all the objects
-            for wsc in transaction_info.changes.iter() {
+            for wsc in transaction_info
+                .changes
+                .iter()
+                .filter(|wsc| wsc.change.is_some())
+            {
                 if let Change::WriteResource(wr) = wsc.change.as_ref().unwrap() {
                     if let Some(object) =
                         ObjectWithMetadata::from_write_resource(wr, txn_version).unwrap()
@@ -802,7 +806,11 @@ async fn parse_v2_token(
             }
 
             // Need to do a second pass to get all the structs related to the object
-            for wsc in transaction_info.changes.iter() {
+            for wsc in transaction_info
+                .changes
+                .iter()
+                .filter(|wsc| wsc.change.is_some())
+            {
                 if let Change::WriteResource(wr) = wsc.change.as_ref().unwrap() {
                     let address = standardize_address(&wr.address.to_string());
                     if let Some(aggregated_data) = token_v2_metadata_helper.get_mut(&address) {
@@ -918,7 +926,12 @@ async fn parse_v2_token(
                 }
             }
 
-            for (index, wsc) in transaction_info.changes.iter().enumerate() {
+            for (index, wsc) in transaction_info
+                .changes
+                .iter()
+                .filter(|wsc| wsc.change.is_some())
+                .enumerate()
+            {
                 let wsc_index = index as i64;
                 match wsc.change.as_ref().unwrap() {
                     Change::WriteTableItem(table_item) => {

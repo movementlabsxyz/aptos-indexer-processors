@@ -126,6 +126,7 @@ pub struct Worker {
     pub transaction_filter: TransactionFilter,
     pub grpc_response_item_timeout_in_secs: u64,
     pub deprecated_tables: TableFlags,
+    pub sleep_time_between_request: u64,
 }
 
 impl Worker {
@@ -149,6 +150,7 @@ impl Worker {
         transaction_filter: TransactionFilter,
         grpc_response_item_timeout_in_secs: u64,
         deprecated_tables: HashSet<String>,
+        sleep_time_between_request: u64,
     ) -> Result<Self> {
         let processor_name = processor_config.name();
         info!(processor_name = processor_name, "[Parser] Kicking off");
@@ -194,6 +196,7 @@ impl Worker {
             transaction_filter,
             grpc_response_item_timeout_in_secs,
             deprecated_tables: deprecated_tables_flags,
+            sleep_time_between_request,
         })
     }
 
@@ -281,6 +284,7 @@ impl Worker {
         let transaction_filter = self.transaction_filter.clone();
         let grpc_response_item_timeout =
             std::time::Duration::from_secs(self.grpc_response_item_timeout_in_secs);
+        let sleep_time_between_request = self.sleep_time_between_request;
         let fetcher_task = tokio::spawn(async move {
             info!(
                 processor_name = processor_name,
@@ -303,6 +307,7 @@ impl Worker {
                 processor_name.to_string(),
                 transaction_filter,
                 pb_channel_txn_chunk_size,
+                sleep_time_between_request,
             )
             .await
         });
@@ -531,10 +536,11 @@ impl Worker {
                                 PROCESSOR_ERRORS_COUNT
                                     .with_label_values(&[processor_name])
                                     .inc();
-                                panic!(
-                                    "[Parser][T#{}] Error processing '{:}' transactions: {:?}",
-                                    task_index, processor_name, e
-                                );
+                                // panic!(
+                                //     "[Parser][T#{}] Error processing '{:}' transactions: {:?}",
+                                //     task_index, processor_name, e
+                                // );
+                                continue;
                             },
                         };
 

@@ -215,6 +215,9 @@ impl CollectionV2 {
         query_retries: u32,
         query_retry_delay_ms: u64,
     ) -> anyhow::Result<Option<(Self, CurrentCollectionV2)>> {
+        if table_item.data.is_none() {
+            return Ok(None);
+        }
         let table_item_data = table_item.data.as_ref().unwrap();
 
         let maybe_collection_data = match TokenWriteSet::from_table_item_type(

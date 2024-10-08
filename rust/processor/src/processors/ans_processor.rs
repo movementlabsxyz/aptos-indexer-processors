@@ -547,7 +547,11 @@ fn parse_ans(
             }
 
             // Parse V2 ANS subdomain exts
-            for wsc in transaction_info.changes.iter() {
+            for wsc in transaction_info
+                .changes
+                .iter()
+                .filter(|wsc| wsc.change.is_some())
+            {
                 match wsc.change.as_ref().unwrap() {
                     WriteSetChange::WriteResource(write_resource) => {
                         if let Some(subdomain_ext) = SubdomainExtV2::from_write_resource(
@@ -569,7 +573,12 @@ fn parse_ans(
             }
 
             // Parse V1 ANS write set changes
-            for (wsc_index, wsc) in transaction_info.changes.iter().enumerate() {
+            for (wsc_index, wsc) in transaction_info
+                .changes
+                .iter()
+                .filter(|wsc| wsc.change.is_some())
+                .enumerate()
+            {
                 match wsc.change.as_ref().unwrap() {
                     WriteSetChange::WriteTableItem(table_item) => {
                         if let Some((current_ans_lookup, ans_lookup)) =

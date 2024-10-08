@@ -59,6 +59,9 @@ impl CurrentTokenPendingClaim {
         txn_timestamp: chrono::NaiveDateTime,
         table_handle_to_owner: &TableHandleToOwner,
     ) -> anyhow::Result<Option<Self>> {
+        if table_item.data.is_none() {
+            return Ok(None);
+        }
         let table_item_data = table_item.data.as_ref().unwrap();
 
         let maybe_offer = match TokenWriteSet::from_table_item_type(
@@ -137,6 +140,9 @@ impl CurrentTokenPendingClaim {
         txn_timestamp: chrono::NaiveDateTime,
         table_handle_to_owner: &TableHandleToOwner,
     ) -> anyhow::Result<Option<Self>> {
+        if table_item.data.is_none() {
+            return Ok(None);
+        }
         let table_item_data = table_item.data.as_ref().unwrap();
 
         let maybe_offer = match TokenWriteSet::from_table_item_type(

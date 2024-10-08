@@ -50,6 +50,9 @@ impl CurrentTokenRoyaltyV1 {
         transaction_version: i64,
         transaction_timestamp: chrono::NaiveDateTime,
     ) -> anyhow::Result<Option<Self>> {
+        if write_table_item.data.is_none() {
+            return Ok(None);
+        }
         let table_item_data = write_table_item.data.as_ref().unwrap();
 
         let maybe_token_data = match TokenWriteSet::from_table_item_type(

@@ -81,20 +81,21 @@ impl CurrentDelegatedVoter {
     ) -> anyhow::Result<CurrentDelegatedVoterMap> {
         let mut delegated_voter_map: CurrentDelegatedVoterMap = AHashMap::new();
 
-        let table_item_data = write_table_item.data.as_ref().unwrap();
-        let table_handle = standardize_address(&write_table_item.handle);
-        if let Some(VoteDelegationTableItem::VoteDelegationVector(vote_delegation_vector)) =
-            VoteDelegationTableItem::from_table_item_type(
-                table_item_data.value_type.as_str(),
-                &table_item_data.value,
-                txn_version,
-            )?
-        {
-            let pool_address = match vote_delegation_handle_to_pool_address.get(&table_handle) {
-                Some(pool_address) => pool_address.clone(),
-                None => {
-                    // look up from db
-                    Self::get_delegation_pool_address_by_table_handle(conn, &table_handle, query_retries, query_retry_delay_ms).await
+        if write_table_item.data.is_some() {
+            let table_item_data = write_table_item.data.as_ref().unwrap();
+            let table_handle = standardize_address(&write_table_item.handle);
+            if let Some(VoteDelegationTableItem::VoteDelegationVector(vote_delegation_vector)) =
+                VoteDelegationTableItem::from_table_item_type(
+                    table_item_data.value_type.as_str(),
+                    &table_item_data.value,
+                    txn_version,
+                )?
+            {
+                let pool_address = match vote_delegation_handle_to_pool_address.get(&table_handle) {
+                    Some(pool_address) => pool_address.clone(),
+                    None => {
+                        // look up from db
+                        Self::get_delegation_pool_address_by_table_handle(conn, &table_handle, query_retries, query_retry_delay_ms).await
                         .unwrap_or_else(|_| {
                             tracing::error!(
                                 transaction_version = txn_version,
@@ -103,28 +104,30 @@ impl CurrentDelegatedVoter {
                             );
                             "".to_string()
                         })
-                },
-            };
-            if !pool_address.is_empty() {
-                for inner in vote_delegation_vector {
-                    let delegator_address = inner.get_delegator_address();
-                    let voter = inner.value.get_voter();
-                    let pending_voter = inner.value.get_pending_voter();
+                    },
+                };
+                if !pool_address.is_empty() {
+                    for inner in vote_delegation_vector {
+                        let delegator_address = inner.get_delegator_address();
+                        let voter = inner.value.get_voter();
+                        let pending_voter = inner.value.get_pending_voter();
 
-                    let delegated_voter = CurrentDelegatedVoter {
-                        delegator_address: delegator_address.clone(),
-                        delegation_pool_address: pool_address.clone(),
-                        voter: Some(voter.clone()),
-                        pending_voter: Some(pending_voter.clone()),
-                        last_transaction_timestamp: txn_timestamp,
-                        last_transaction_version: txn_version,
-                        table_handle: Some(table_handle.clone()),
-                    };
-                    delegated_voter_map
-                        .insert((pool_address.clone(), delegator_address), delegated_voter);
+                        let delegated_voter = CurrentDelegatedVoter {
+                            delegator_address: delegator_address.clone(),
+                            delegation_pool_address: pool_address.clone(),
+                            voter: Some(voter.clone()),
+                            pending_voter: Some(pending_voter.clone()),
+                            last_transaction_timestamp: txn_timestamp,
+                            last_transaction_version: txn_version,
+                            table_handle: Some(table_handle.clone()),
+                        };
+                        delegated_voter_map
+                            .insert((pool_address.clone(), delegator_address), delegated_voter);
+                    }
                 }
             }
         }
+
         Ok(delegated_voter_map)
     }
 

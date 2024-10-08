@@ -92,7 +92,7 @@ impl AccountTransaction {
         for event in events {
             account_transactions.extend(Self::from_event(event, txn_version));
         }
-        for wsc in wscs {
+        for wsc in wscs.iter().filter(|wsc| wsc.change.is_some()) {
             match wsc.change.as_ref().unwrap() {
                 Change::DeleteResource(res) => {
                     account_transactions

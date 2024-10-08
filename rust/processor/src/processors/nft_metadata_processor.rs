@@ -235,7 +235,11 @@ async fn parse_v2_token(
         let transaction_info = txn.info.as_ref().expect("Transaction info doesn't exist!");
 
         let mut token_v2_metadata_helper: ObjectAggregatedDataMapping = AHashMap::new();
-        for wsc in transaction_info.changes.iter() {
+        for wsc in transaction_info
+            .changes
+            .iter()
+            .filter(|wsc| wsc.change.is_some())
+        {
             if let Change::WriteResource(wr) = wsc.change.as_ref().unwrap() {
                 if let Some(object) =
                     ObjectWithMetadata::from_write_resource(wr, txn_version).unwrap()
@@ -264,7 +268,12 @@ async fn parse_v2_token(
             }
         }
 
-        for (index, wsc) in transaction_info.changes.iter().enumerate() {
+        for (index, wsc) in transaction_info
+            .changes
+            .iter()
+            .filter(|wsc| wsc.change.is_some())
+            .enumerate()
+        {
             let wsc_index = index as i64;
             match wsc.change.as_ref().unwrap() {
                 Change::WriteTableItem(table_item) => {

@@ -127,7 +127,11 @@ impl Token {
                 .as_ref()
                 .expect("Transaction info doesn't exist!");
 
-            for wsc in &transaction_info.changes {
+            for wsc in transaction_info
+                .changes
+                .iter()
+                .filter(|wsc| wsc.change.is_some())
+            {
                 // Basic token and ownership data
                 let (maybe_token_w_ownership, maybe_token_data, maybe_collection_data) =
                     match wsc.change.as_ref().unwrap() {
@@ -232,6 +236,9 @@ impl Token {
         txn_timestamp: chrono::NaiveDateTime,
         table_handle_to_owner: &TableHandleToOwner,
     ) -> anyhow::Result<Option<(Self, Option<TokenOwnership>, Option<CurrentTokenOwnership>)>> {
+        if table_item.data.is_none() {
+            return Ok(None);
+        }
         let table_item_data = table_item.data.as_ref().unwrap();
 
         let maybe_token = match TokenWriteSet::from_table_item_type(
@@ -290,6 +297,9 @@ impl Token {
         txn_timestamp: chrono::NaiveDateTime,
         table_handle_to_owner: &TableHandleToOwner,
     ) -> anyhow::Result<Option<(Self, Option<TokenOwnership>, Option<CurrentTokenOwnership>)>> {
+        if table_item.data.is_none() {
+            return Ok(None);
+        }
         let table_item_data = table_item.data.as_ref().unwrap();
 
         let maybe_token_id = match TokenWriteSet::from_table_item_type(
@@ -354,7 +364,11 @@ impl TableMetadataForToken {
                     .info
                     .as_ref()
                     .expect("Transaction info doesn't exist!");
-                for wsc in &transaction_info.changes {
+                for wsc in transaction_info
+                    .changes
+                    .iter()
+                    .filter(|wsc| wsc.change.is_some())
+                {
                     if let WriteSetChangeEnum::WriteResource(write_resource) =
                         wsc.change.as_ref().unwrap()
                     {
