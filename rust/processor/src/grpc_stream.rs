@@ -239,6 +239,7 @@ pub async fn get_chain_id(
     indexer_grpc_reconnection_timeout_secs: Duration,
     auth_token: String,
     processor_name: String,
+    starting_version_from_db: u64,
 ) -> u64 {
     info!(
         processor_name = processor_name,
@@ -251,8 +252,8 @@ pub async fn get_chain_id(
         indexer_grpc_http2_ping_interval,
         indexer_grpc_http2_ping_timeout,
         indexer_grpc_reconnection_timeout_secs,
-        1,
-        Some(2),
+        starting_version_from_db,
+        Some(starting_version_from_db + 1),
         auth_token.clone(),
         processor_name.to_string(),
     )

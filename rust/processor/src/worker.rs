@@ -257,6 +257,7 @@ impl Worker {
             self.grpc_http2_config.grpc_connection_timeout_secs(),
             self.auth_token.clone(),
             processor_name.to_string(),
+            starting_version_from_db,
         )
         .await;
         self.check_or_update_chain_id(chain_id as i64)
