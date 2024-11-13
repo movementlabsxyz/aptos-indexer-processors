@@ -173,7 +173,7 @@ pub trait ProcessorTrait: Send + Sync + Debug {
     derive(
         Deserialize,
         Serialize,
-        strum::EnumVariantNames,
+        strum::VariantNames,
         strum::IntoStaticStr,
         strum::Display,
         clap::ValueEnum
@@ -230,7 +230,7 @@ impl ProcessorConfig {
     test,
     derive(strum::EnumDiscriminants),
     strum_discriminants(
-        derive(strum::EnumVariantNames),
+        derive(strum::VariantNames),
         name(ProcessorDiscriminants),
         strum(serialize_all = "snake_case")
     )
