@@ -214,10 +214,10 @@ impl AnsWriteResource {
         let data = write_resource.data.as_str();
 
         match type_str.clone() {
-            x if x == format!("{}::v2_1_domains::NameRecord", ans_v2_contract_address) => {
+            x if x == format!("{}::domains::NameRecord", ans_v2_contract_address) => {
                 serde_json::from_str(data).map(|inner| Some(Self::NameRecordV2(inner)))
             },
-            x if x == format!("{}::v2_1_domains::SubdomainExt", ans_v2_contract_address) => {
+            x if x == format!("{}::domains::SubdomainExt", ans_v2_contract_address) => {
                 serde_json::from_str(data).map(|inner| Some(Self::SubdomainExtV2(inner)))
             },
             _ => Ok(None),
@@ -324,10 +324,10 @@ impl V2AnsEvent {
     pub fn is_event_supported(event_type: &str, ans_v2_contract_address: &str) -> bool {
         [
             format!(
-                "{}::v2_1_domains::SetReverseLookupEvent",
+                "{}::domains::SetReverseLookupEvent",
                 ans_v2_contract_address
             ),
-            format!("{}::v2_1_domains::RenewNameEvent", ans_v2_contract_address),
+            format!("{}::domains::RenewNameEvent", ans_v2_contract_address),
         ]
         .contains(&event_type.to_string())
     }
@@ -347,13 +347,13 @@ impl V2AnsEvent {
         match type_str.clone() {
             x if x
                 == format!(
-                    "{}::v2_1_domains::SetReverseLookupEvent",
+                    "{}::domains::SetReverseLookupEvent",
                     ans_v2_contract_address
                 ) =>
             {
                 serde_json::from_str(data).map(|inner| Some(Self::SetReverseLookupEvent(inner)))
             },
-            x if x == format!("{}::v2_1_domains::RenewNameEvent", ans_v2_contract_address) => {
+            x if x == format!("{}::domains::RenewNameEvent", ans_v2_contract_address) => {
                 serde_json::from_str(data).map(|inner| Some(Self::RenewNameEvent(inner)))
             },
             _ => Ok(None),
