@@ -354,8 +354,8 @@ dependencies = [
 
 [[package]]
 name = "bcs"
-version = "0.1.4"
-source = "git+https://github.com/aptos-labs/bcs.git?rev=d31fab9d81748e2594be5cd5cdf845786a30562d#d31fab9d81748e2594be5cd5cdf845786a30562d"
+version = "0.1.6"
+source = "git+https://github.com/movementlabsxyz/bcs.git?rev=bc16d2d39cabafaabd76173dd1b04b2aa170cf0c#bc16d2d39cabafaabd76173dd1b04b2aa170cf0c"
 dependencies = [
  "serde",
  "thiserror",
