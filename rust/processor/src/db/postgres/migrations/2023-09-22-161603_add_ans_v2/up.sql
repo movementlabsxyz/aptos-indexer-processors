@@ -89,7 +89,7 @@ SELECT
     capn.last_transaction_version) as last_transaction_version,
     coalesce(not capn.is_deleted,
     false) as is_primary,
-    concat(cal.domain, '.apt') as domain_with_suffix,
+    concat(cal.domain, '.move') as domain_with_suffix,
     c.owner_address as owner_address,
     cal.expiration_timestamp >= CURRENT_TIMESTAMP as is_active
 FROM current_ans_lookup_v2 cal
