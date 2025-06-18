@@ -105,10 +105,10 @@ impl ProcessorTrait for NftMetadataProcessor {
         let query_retries = self.config.query_retries;
         let query_retry_delay_ms = self.config.query_retry_delay_ms;
 
-        let db_chain_id = db_chain_id.unwrap_or_else(|| {
+        let db_chain_id = db_chain_id.ok_or_else(|| {
             error!("[NFT Metadata Crawler] db_chain_id must not be null");
-            panic!();
-        });
+            anyhow::anyhow!("[NFT Metadata Crawler] db_chain_id must not be null")
+        })?;
 
         // First get all token related table metadata from the batch of transactions. This is in case
         // an earlier transaction has metadata (in resources) that's missing from a later transaction.

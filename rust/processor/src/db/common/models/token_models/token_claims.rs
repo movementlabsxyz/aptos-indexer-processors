@@ -156,13 +156,16 @@ impl CurrentTokenPendingClaim {
         if let Some(offer) = &maybe_offer {
             let table_handle = standardize_address(&table_item.handle.to_string());
 
-            let table_metadata = table_handle_to_owner.get(&table_handle).unwrap_or_else(|| {
-                panic!(
+            let table_metadata = table_handle_to_owner.get(&table_handle).ok_or_else(|| {
+                tracing::error!(
                     "Missing table handle metadata for claim. \
                     Version: {}, table handle for PendingClaims: {}, all metadata: {:?}",
-                    txn_version, table_handle, table_handle_to_owner
-                )
-            });
+                    txn_version,
+                    table_handle,
+                    table_handle_to_owner
+                );
+                anyhow::anyhow!("Missing table handle metadata for claim")
+            })?;
 
             let token_id = offer.token_id.clone();
             let token_data_id_struct = token_id.token_data_id;

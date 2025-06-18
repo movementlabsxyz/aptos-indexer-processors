@@ -638,14 +638,17 @@ async fn parse_v2_coin(
                 &event_to_v1_coin_type,
                 index as i64,
             )
-            .unwrap_or_else(|e| {
+            .map_err(|e| {
                 tracing::error!(
                     transaction_version = txn_version,
                     index = index,
                     error = ?e,
                     "[Parser] error parsing fungible asset activity v1");
-                panic!("[Parser] error parsing fungible asset activity v1");
-            }) {
+                anyhow::anyhow!("[Parser] error parsing fungible asset activity v1")
+            })
+            .ok()
+            .flatten()
+            {
                 fungible_asset_activities.push(v1_activity);
             }
             if let Some(v2_activity) = FungibleAssetActivity::get_v2_from_event(
@@ -658,14 +661,17 @@ async fn parse_v2_coin(
                 &fungible_asset_object_helper,
             )
             .await
-            .unwrap_or_else(|e| {
+            .map_err(|e| {
                 tracing::error!(
                     transaction_version = txn_version,
                     index = index,
                     error = ?e,
                     "[Parser] error parsing fungible asset activity v2");
-                panic!("[Parser] error parsing fungible asset activity v2");
-            }) {
+                anyhow::anyhow!("[Parser] error parsing fungible asset activity v2")
+            })
+            .ok()
+            .flatten()
+            {
                 fungible_asset_activities.push(v2_activity);
             }
         }
@@ -685,14 +691,16 @@ async fn parse_v2_coin(
                             txn_version,
                             txn_timestamp,
                         )
-                        .unwrap_or_else(|e| {
+                        .map_err(|e| {
                             tracing::error!(
                             transaction_version = txn_version,
                             index = index,
                                 error = ?e,
                             "[Parser] error parsing fungible metadata v1");
-                            panic!("[Parser] error parsing fungible metadata v1");
+                            anyhow::anyhow!("[Parser] error parsing fungible metadata v1")
                         })
+                        .ok()
+                        .flatten()
                     {
                         fungible_asset_metadata.insert(fa_metadata.asset_type.clone(), fa_metadata);
                     }
@@ -703,14 +711,16 @@ async fn parse_v2_coin(
                             txn_timestamp,
                             &fungible_asset_object_helper,
                         )
-                        .unwrap_or_else(|e| {
+                        .map_err(|e| {
                             tracing::error!(
                             transaction_version = txn_version,
                             index = index,
                                 error = ?e,
                             "[Parser] error parsing fungible metadata v2");
-                            panic!("[Parser] error parsing fungible metadata v2");
+                            anyhow::anyhow!("[Parser] error parsing fungible metadata v2")
                         })
+                        .ok()
+                        .flatten()
                     {
                         fungible_asset_metadata.insert(fa_metadata.asset_type.clone(), fa_metadata);
                     }
@@ -723,14 +733,16 @@ async fn parse_v2_coin(
                             &fungible_asset_object_helper,
                         )
                         .await
-                        .unwrap_or_else(|e| {
+                        .map_err(|e| {
                             tracing::error!(
                             transaction_version = txn_version,
                             index = index,
                                 error = ?e,
                             "[Parser] error parsing fungible balance v2");
-                            panic!("[Parser] error parsing fungible balance v2");
+                            anyhow::anyhow!("[Parser] error parsing fungible balance v2")
                         })
+                        .ok()
+                        .flatten()
                     {
                         fungible_asset_balances.push(balance);
                         current_fungible_asset_balances

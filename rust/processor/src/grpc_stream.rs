@@ -439,7 +439,7 @@ pub async fn create_fetcher_loop(
                                 current_fetched_version = start_version,
                                 "[Parser] Received batch with gap from GRPC stream"
                             );
-                            panic!("[Parser] Received batch with gap from GRPC stream");
+                            return;
                         }
                         last_fetched_version = end_version as i64;
 
@@ -486,7 +486,7 @@ pub async fn create_fetcher_loop(
                                         error = ?e,
                                         "[Parser] Error sending GRPC response to channel."
                                     );
-                                    panic!("[Parser] Error sending GRPC response to channel.")
+                                    return;
                                 },
                             }
                         } else {
@@ -523,7 +523,7 @@ pub async fn create_fetcher_loop(
                                             error = ?e,
                                             "[Parser] Error sending GRPC response to channel."
                                         );
-                                        panic!("[Parser] Error sending GRPC response to channel.")
+                                        return;
                                     },
                                 }
                             }
@@ -661,7 +661,7 @@ pub async fn create_fetcher_loop(
                     stream_address = indexer_grpc_data_service_address.to_string(),
                     "[Parser] Reconnected more than {RECONNECTION_MAX_RETRIES} times. Will not retry.",
                 );
-                panic!("[Parser] Reconnected more than {RECONNECTION_MAX_RETRIES} times. Will not retry.")
+                return;
             }
             reconnection_retries += 1;
             info!(

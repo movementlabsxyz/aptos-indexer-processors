@@ -120,13 +120,13 @@ impl Signature {
         t: &TransactionSignaturePb,
         transaction_version: i64,
     ) -> Option<String> {
-        let sig = t.signature.as_ref().unwrap_or_else(|| {
+        let sig = t.signature.as_ref().or_else(|| {
             tracing::error!(
                 transaction_version = transaction_version,
                 "Transaction signature is missing"
             );
-            panic!("Transaction signature is missing");
-        });
+            None
+        })?;
         match sig {
             SignatureEnum::FeePayer(sig) => Some(standardize_address(&sig.fee_payer_address)),
             _ => None,

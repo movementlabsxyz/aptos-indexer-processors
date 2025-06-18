@@ -115,7 +115,7 @@ impl FungibleAssetMetadataModel {
                     &write_resource.r#type.as_ref().unwrap().generic_type_params[0],
                     write_resource.type_str.as_ref(),
                     txn_version,
-                );
+                )?;
                 let (supply_aggregator_table_handle, supply_aggregator_table_key) = inner
                     .get_aggregator_metadata()
                     .map(|agg| (Some(agg.handle), Some(agg.key)))
@@ -158,7 +158,7 @@ impl FungibleAssetMetadataModel {
                     &delete_resource.r#type.as_ref().unwrap().generic_type_params[0],
                     delete_resource.type_str.as_ref(),
                     txn_version,
-                );
+                )?;
                 let (supply_aggregator_table_handle, supply_aggregator_table_key) = inner
                     .get_aggregator_metadata()
                     .map(|agg| (Some(agg.handle), Some(agg.key)))

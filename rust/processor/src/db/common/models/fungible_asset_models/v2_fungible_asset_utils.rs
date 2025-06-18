@@ -29,15 +29,15 @@ pub struct FeeStatement {
 impl FeeStatement {
     pub fn from_event(data_type: &str, data: &str, txn_version: i64) -> Option<Self> {
         if data_type == "0x1::transaction_fee::FeeStatement" {
-            let fee_statement: FeeStatement = serde_json::from_str(data).unwrap_or_else(|_| {
-                tracing::error!(
-                    transaction_version = txn_version,
-                    data = data,
-                    "failed to parse event for fee statement"
-                );
-                panic!();
-            });
-            Some(fee_statement)
+            serde_json::from_str(data)
+                .map_err(|_| {
+                    tracing::error!(
+                        transaction_version = txn_version,
+                        data = data,
+                        "failed to parse event for fee statement"
+                    );
+                })
+                .ok()
         } else {
             None
         }

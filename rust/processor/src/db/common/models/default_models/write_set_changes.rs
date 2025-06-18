@@ -186,9 +186,7 @@ impl WriteSetChange {
             WriteSetChangeTypeEnum::WriteModule => "write_module".to_string(),
             WriteSetChangeTypeEnum::WriteResource => "write_resource".to_string(),
             WriteSetChangeTypeEnum::WriteTableItem => "write_table_item".to_string(),
-            WriteSetChangeTypeEnum::Unspecified => {
-                panic!("WriteSetChange type must be specified.")
-            },
+            WriteSetChangeTypeEnum::Unspecified => "unspecified_writeset".to_string(),
         }
     }
 }

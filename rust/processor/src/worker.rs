@@ -501,10 +501,7 @@ impl Worker {
                                 "[Parser][T#{}] Stream somehow changed chain id!",
                                 task_index
                             );
-                            panic!(
-                                "[Parser][T#{}] Stream somehow changed chain id!",
-                                task_index
-                            );
+                            break;
                         }
 
                         let processing_time = std::time::Instant::now();
