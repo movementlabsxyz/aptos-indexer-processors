@@ -588,13 +588,17 @@ fn parse_ans(
                                 txn_version,
                                 wsc_index as i64,
                             )
-                            .unwrap_or_else(|e| {
+                            .map_err(|e| {
                                 error!(
                                     error = ?e,
                                     "Error parsing ANS v1 name record from write table item"
                                 );
-                                panic!();
+                                anyhow::anyhow!(
+                                    "Error parsing ANS v1 name record from write table item"
+                                )
                             })
+                            .ok()
+                            .flatten()
                         {
                             all_current_ans_lookups
                                 .insert(current_ans_lookup.pk(), current_ans_lookup.clone());
@@ -614,13 +618,17 @@ fn parse_ans(
                                 txn_version,
                                 wsc_index as i64,
                             )
-                                .unwrap_or_else(|e| {
-                                    error!(
-                                error = ?e,
-                                "Error parsing ANS v1 primary name from write table item"
-                            );
-                                    panic!();
-                                })
+                            .map_err(|e| {
+                                error!(
+                                    error = ?e,
+                                    "Error parsing ANS v1 primary name from write table item"
+                                );
+                                anyhow::anyhow!(
+                                    "Error parsing ANS v1 primary name from write table item"
+                                )
+                            })
+                            .ok()
+                            .flatten()
                         {
                             all_current_ans_primary_names
                                 .insert(current_primary_name.pk(), current_primary_name.clone());
@@ -642,13 +650,17 @@ fn parse_ans(
                                 txn_version,
                                 wsc_index as i64,
                             )
-                            .unwrap_or_else(|e| {
+                            .map_err(|e| {
                                 error!(
                                     error = ?e,
                                     "Error parsing ANS v1 name record from delete table item"
                                 );
-                                panic!();
+                                anyhow::anyhow!(
+                                    "Error parsing ANS v1 name record from delete table item"
+                                )
                             })
+                            .ok()
+                            .flatten()
                         {
                             all_current_ans_lookups
                                 .insert(current_ans_lookup.pk(), current_ans_lookup.clone());
@@ -668,13 +680,17 @@ fn parse_ans(
                                 txn_version,
                                 wsc_index as i64,
                             )
-                                .unwrap_or_else(|e| {
-                                    error!(
-                                error = ?e,
-                                "Error parsing ANS v1 primary name from delete table item"
-                            );
-                                    panic!();
-                                })
+                            .map_err(|e| {
+                                error!(
+                                    error = ?e,
+                                    "Error parsing ANS v1 primary name from delete table item"
+                                );
+                                anyhow::anyhow!(
+                                    "Error parsing ANS v1 primary name from delete table item"
+                                )
+                            })
+                            .ok()
+                            .flatten()
                         {
                             all_current_ans_primary_names
                                 .insert(current_primary_name.pk(), current_primary_name.clone());
@@ -697,13 +713,17 @@ fn parse_ans(
                                 wsc_index as i64,
                                 &v2_address_to_subdomain_ext,
                             )
-                            .unwrap_or_else(|e| {
+                            .map_err(|e| {
                                 error!(
                                     error = ?e,
                                     "Error parsing ANS v2 name record from write resource"
                                 );
-                                panic!();
+                                anyhow::anyhow!(
+                                    "Error parsing ANS v2 name record from write resource"
+                                )
                             })
+                            .ok()
+                            .flatten()
                         {
                             all_current_ans_lookups_v2
                                 .insert(current_ans_lookup_v2.pk(), current_ans_lookup_v2);

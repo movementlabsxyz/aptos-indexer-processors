@@ -234,15 +234,10 @@ impl CoinActivity {
             addr: standardize_address(event.key.as_ref().unwrap().account_address.as_str()),
             creation_num: event.key.as_ref().unwrap().creation_number as i64,
         };
-        let coin_type =
-            event_to_coin_type
-                .get(&event_move_guid)
-                .unwrap_or_else(|| {
-                    panic!(
-                        "Could not find event in resources (CoinStore), version: {}, event guid: {:?}, mapping: {:?}",
-                        txn_version, event_move_guid, event_to_coin_type
-                    )
-                }).clone();
+        let coin_type = event_to_coin_type
+            .get(&event_move_guid)
+            .cloned()
+            .unwrap_or_else(|| "0x1::coin::UnknownCoinType".to_string());
 
         Self {
             transaction_version: txn_version,

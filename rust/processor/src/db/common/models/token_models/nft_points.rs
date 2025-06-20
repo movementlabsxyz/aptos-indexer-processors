@@ -85,43 +85,46 @@ impl NftPoints {
                     let payload_cleaned = get_clean_payload(payload, version).unwrap();
                     let args = payload_cleaned["arguments"]
                         .as_array()
-                        .unwrap_or_else(|| {
+                        .or_else(|| {
                             tracing::error!(
                                 transaction_version = version,
                                 payload = ?payload_cleaned,
                                 "Failed to get arguments from nft_points transaction"
                             );
-                            panic!()
-                        })
+                            None
+                        })?
                         .iter()
                         .map(|x| {
-                            unescape::unescape(x.as_str().unwrap_or_else(|| {
+                            unescape::unescape(x.as_str().or_else(|| {
                                 tracing::error!(
                                     transaction_version = version,
                                     payload = ?payload_cleaned,
                                     "Failed to parse arguments from nft_points transaction"
                                 );
-                                panic!()
-                            }))
-                            .unwrap_or_else(|| {
+                                None
+                            })?)
+                            .or_else(|| {
                                 tracing::error!(
                                     transaction_version = version,
                                     payload = ?payload_cleaned,
                                     "Failed to escape arguments from nft_points transaction"
                                 );
-                                panic!()
+                                None
                             })
                         })
-                        .collect::<Vec<String>>();
+                        .collect::<Option<Vec<String>>>()?;
                     let owner_address = standardize_address(&args[0]);
-                    let amount = args[2].parse().unwrap_or_else(|_| {
-                        tracing::error!(
-                            transaction_version = version,
-                            argument = &args[2],
-                            "Failed to parse amount from nft_points transaction"
-                        );
-                        panic!()
-                    });
+                    let amount = args[2].parse().map_or_else(
+                        |_| {
+                            tracing::error!(
+                                transaction_version = version,
+                                argument = &args[2],
+                                "Failed to parse amount from nft_points transaction"
+                            );
+                            None
+                        },
+                        Some,
+                    )?;
                     let transaction_timestamp = parse_timestamp(timestamp, version);
                     return Some(Self {
                         transaction_version: version,

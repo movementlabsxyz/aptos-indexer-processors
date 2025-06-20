@@ -168,17 +168,23 @@ pub fn get_clean_payload(payload: &TransactionPayload, version: i64) -> Option<V
     match payload.payload.as_ref().unwrap() {
         PayloadType::EntryFunctionPayload(inner) => {
             let clean = get_clean_entry_function_payload(inner, version);
-            Some(serde_json::to_value(clean).unwrap_or_else(|_| {
-                tracing::error!(version = version, "Unable to serialize payload into value");
-                panic!()
-            }))
+            serde_json::to_value(clean).map_or_else(
+                |_| {
+                    tracing::error!(version = version, "Unable to serialize payload into value");
+                    None
+                },
+                Some,
+            )
         },
         PayloadType::ScriptPayload(inner) => {
             let clean = get_clean_script_payload(inner, version);
-            Some(serde_json::to_value(clean).unwrap_or_else(|_| {
-                tracing::error!(version = version, "Unable to serialize payload into value");
-                panic!()
-            }))
+            serde_json::to_value(clean).map_or_else(
+                |_| {
+                    tracing::error!(version = version, "Unable to serialize payload into value");
+                    None
+                },
+                Some,
+            )
         },
         PayloadType::WriteSetPayload(inner) => {
             if let Some(writeset) = inner.write_set.as_ref() {
@@ -211,10 +217,13 @@ pub fn get_clean_payload(payload: &TransactionPayload, version: i64) -> Option<V
                     transaction_payload: None,
                 }
             };
-            Some(serde_json::to_value(clean).unwrap_or_else(|_| {
-                tracing::error!(version = version, "Unable to serialize payload into value");
-                panic!()
-            }))
+            serde_json::to_value(clean).map_or_else(
+                |_| {
+                    tracing::error!(version = version, "Unable to serialize payload into value");
+                    None
+                },
+                Some,
+            )
         },
     }
 }
@@ -231,16 +240,12 @@ pub fn get_clean_writeset(writeset: &WriteSet, version: i64) -> Option<Value> {
                 return None;
             }
             let payload = inner.script.as_ref().unwrap();
-            Some(
-                serde_json::to_value(get_clean_script_payload(payload, version)).unwrap_or_else(
-                    |_| {
-                        tracing::error!(
-                            version = version,
-                            "Unable to serialize payload into value"
-                        );
-                        panic!()
-                    },
-                ),
+            serde_json::to_value(get_clean_script_payload(payload, version)).map_or_else(
+                |_| {
+                    tracing::error!(version = version, "Unable to serialize payload into value");
+                    None
+                },
+                Some,
             )
         },
         WriteSetType::DirectWriteSet(_) => None,

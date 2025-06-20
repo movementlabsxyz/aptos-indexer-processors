@@ -54,23 +54,30 @@ impl AccountTransaction {
                 return AHashMap::new();
             },
         };
-        let transaction_info = transaction.info.as_ref().unwrap_or_else(|| {
-            panic!("Transaction info doesn't exist for version {}", txn_version)
-        });
-        let wscs = &transaction_info.changes;
+        let vec_changes = vec![];
+        let wscs = transaction
+            .info
+            .as_ref()
+            .map(|transaction_info| &transaction_info.changes)
+            .unwrap_or_else(|| &vec_changes);
         // Can be removed with rustc version 1.80+ and replace with &Vec::new()
         let default = Vec::new();
         let (events, signatures) = match txn_data {
-            TxnData::User(inner) => (
-                &inner.events,
-                UserTransaction::get_signatures(
-                    inner.request.as_ref().unwrap_or_else(|| {
-                        panic!("User request doesn't exist for version {}", txn_version)
-                    }),
-                    txn_version,
-                    transaction.block_height as i64,
-                ),
-            ),
+            TxnData::User(inner) => {
+                let signatures = inner
+                    .request
+                    .as_ref()
+                    .map(|request| {
+                        UserTransaction::get_signatures(
+                            request,
+                            txn_version,
+                            transaction.block_height as i64,
+                        )
+                    })
+                    .unwrap_or_else(|| vec![]);
+
+                (&inner.events, signatures)
+            },
             TxnData::Genesis(inner) => (&inner.events, vec![]),
             TxnData::BlockMetadata(inner) => (&inner.events, vec![]),
             // No events in Movement protobuf Validator Tx.

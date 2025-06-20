@@ -255,14 +255,17 @@ async fn parse_v2_coin(
                         &fungible_asset_object_helper,
                     )
                     .await
-                    .unwrap_or_else(|e| {
+                    .map_err(|e| {
                         tracing::error!(
                             transaction_version = txn_version,
                             index = index,
                                 error = ?e,
                             "[Parser] error parsing fungible balance v2");
-                        panic!("[Parser] error parsing fungible balance v2");
-                    }) {
+                        anyhow::anyhow!("[Parser] error parsing fungible balance v2")
+                    })
+                    .ok()
+                    .flatten()
+                    {
                         fungible_asset_balances.push(balance);
                         transaction_version_to_struct_count
                             .entry(txn_version)

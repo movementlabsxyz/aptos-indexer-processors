@@ -54,7 +54,7 @@ impl CoinBalance {
                     &write_resource.r#type.as_ref().unwrap().generic_type_params[0],
                     write_resource.type_str.as_ref(),
                     txn_version,
-                );
+                )?;
                 let owner_address = standardize_address(write_resource.address.as_str());
                 let coin_balance = Self {
                     transaction_version: txn_version,
